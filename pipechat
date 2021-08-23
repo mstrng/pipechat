@@ -1,0 +1,42 @@
+#!/bin/sh
+basedir="/tmp/pipechat"
+[ -d $basedir ] || {
+	mkdir $basedir 
+	chmod 777 $basedir
+}
+
+[ -p $basedir/${USER} ] || {
+	mkfifo $basedir/${USER}
+	chmod 622 $basedir/${USER}
+}	
+
+while true; do cat $basedir/$USER; done &
+
+listen_pid=$!
+
+choice=""
+choice2=""
+while [ "$choice" != "q" ]
+do
+	echo "Available users: (Type 'q' to exit)"
+	ls $basedir
+	read choice
+	[ -p $basedir/$choice ] && {
+ 		clear
+		echo "Chat with $choice. -Type :quit to exit"
+		while true 
+		do
+			read choice2
+			case $choice2 in
+				:quit) break ;;
+				:help) echo "Type :quit to quit." ;;
+				#*) printf "\e[0;36m${USER}: $choice2\e[m\n" > $basedir/$choice ;; 
+				*) printf "${USER}: $choice2" > $basedir/$choice ;; 
+			esac	
+		done
+	}	
+
+	[ -p $basedir/$choice ] || [ "$choice" = "q" ] || echo "$choice is not an available user"
+done
+
+kill $listen_pid
