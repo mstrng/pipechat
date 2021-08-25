@@ -16,14 +16,15 @@ listen_pid=$!
 
 choice=""
 choice2=""
-while [ "$choice" != "q" ]
+while [ "$choice" != ":quit" ]
 do
-	echo "Available users: (Type 'q' to exit)"
+	echo "Type an available user or ':quit' to exit."
+	echo "Available users:" 
 	ls $basedir
 	read choice
 	[ -p $basedir/$choice ] && {
  		clear
-		echo "Chat with $choice. -Type :quit to exit"
+		echo "Chat with $choice. --- Type ':quit' to exit"
 		while true 
 		do
 			read choice2
@@ -31,12 +32,12 @@ do
 				:quit) break ;;
 				:help) echo "Type :quit to quit." ;;
 				#*) printf "\e[0;36m${USER}: $choice2\e[m\n" > $basedir/$choice ;; 
-				*) printf "${USER}: $choice2" > $basedir/$choice ;; 
+				*) printf "${USER}: $choice2\n" > $basedir/$choice ;; 
 			esac	
 		done
 	}	
 
-	[ -p $basedir/$choice ] || [ "$choice" = "q" ] || echo "$choice is not an available user"
+	[ -p $basedir/$choice ] || [ "$choice" = ":quit" ] || echo "$choice is not an available user"
 done
 
 kill $listen_pid
